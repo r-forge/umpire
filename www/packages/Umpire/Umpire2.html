@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Kevin R. Coombes and Caitlin E. Coombes" />
+
+
+<title>Umpire 2.0: Clinically Realistic Simulations</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Umpire 2.0: Clinically Realistic Simulations</h1>
+<h4 class="author">Kevin R. Coombes and Caitlin E. Coombes</h4>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Version 2.0 of the Ultimate Microarray Prediction, Inference, and Reality Engine (Umpire) extends the functions of the Umpire 1.0 R package to allow researchers to simulate realistic, mixed-type, clinical data. Statisticians, computer scientists, and clinical informaticians who develop and improve methods to analyze clinical data from a variety of contexts (including clinical trials, population cohorts, and electronic medical record sources) recognize that it is difficult to evaluate methods on real data where “ground truth” is unknown. Frequently, they turn to simulations where the can control the underlying structure, which can result in simulations which are too simplistic to reflect complex clinical data realities. Clinical measurements on patients may be treated as independent, in spite of the elaborate correlation structures that arise in networks, pathways, organ systems, and syndromes in real biology. Further, the researcher finds limited tools at her disposal to facilitate simulation of binary, categorical, or mixed data at this representative level of biological complexity.</p>
+<p>In this vignette, we describe a workflow with the <tt>Umpire</tt> package to simulate biologically realistic, mixed-type clinical data.</p>
+<p>As usual, we start by loading the package:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(Umpire)</span></code></pre></div>
+</div>
+<div id="simulating-mixed-type-clinical-data" class="section level1">
+<h1>Simulating Mixed-Type Clinical Data</h1>
+<p>Since we are going to run simulations, for reproducibility purposes, we should set the seed of the random number generator.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">set.seed</span>(<span class="dv">84503</span>)</span></code></pre></div>
+<div id="model-subtypes-and-survival" class="section level2">
+<h2>Model Subtypes and Survival</h2>
+<p>The simulation workflow begins by simulating complex, correlated, continuous data with known “ground truth” by instantiating a <tt>ClinicalEngine</tt>. We simulate 20 features and 4 clusters of unequal size. The ClinicalEngine generates subtypes (clusters) with known “ground truth” through an implementation of the Umpire 1.0 <tt>CancerModel</tt> and <tt>CancerEngine</tt>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>ce &lt;-<span class="st"> </span><span class="kw">ClinicalEngine</span>(<span class="dv">20</span>, <span class="dv">4</span>, <span class="dt">isWeighted =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">summary</span>(ce)</span></code></pre></div>
+<pre><code>## A &#39;CancerEngine&#39; using the cancer model:
+## --------------
+## Clinical Simulation Model (Raw), a CancerModel object constructed via:
+##    CancerModel(name = &quot;Clinical Simulation Model (Raw)&quot;, nPossible = NP, 
+##     nPattern = nClusters, HIT = hitfn, SURV = SURV, OUT = OUT, 
+##     survivalModel = survivalModel, prevalence = Prevalence(isWeighted, 
+##     nClusters)) 
+## 
+## Pattern prevalences:
+## [1] 0.3173905 0.1315154 0.1265533 0.4245408
+## 
+## Survival effects:
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.63510 -0.40700 -0.24181 -0.21561 -0.01502  0.21166 
+## 
+## Outcome effects:
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.228756 -0.080970 -0.035408 -0.009743  0.116928  0.124044 
+## --------------
+## 
+## Base expression given by:
+## An Engine with 10 components.
+## 
+## Altered expression given by:
+## An Engine with 10 components.</code></pre>
+<p>Note that the prevalences are not equal; when you use <tt>isweighted = TRUE</tt>, they are chosen from a Dirichlet distribution. Note also that the <tt>summary</tt> function describes the object as a <tt>CancerEngine</tt>, since the same underlying structure is used to implement a <tt>ClinicalEngine</tt>.</p>
+<p>Now we confirm that the model expects to produce the 20 features that we requested. It will do so using 10 “components”, where each component consists of a pair of correlated features.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">nrow</span>(ce)</span></code></pre></div>
+<pre><code>## [1] 20</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">nComponents</span>(ce)</span></code></pre></div>
+<pre><code>## [1] 10</code></pre>
+</div>
+<div id="simulate-raw-data" class="section level2">
+<h2>Simulate Raw Data</h2>
+<p>The <tt>ClinicalEngine</tt> is used to simulate the raw, base dataset.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>dset &lt;-<span class="st"> </span><span class="kw">rand</span>(ce, <span class="dv">300</span>)</span></code></pre></div>
+<p>Data are simulated as a list with two objects: simulated <tt>data</tt> and associated <tt>clinical</tt> information, including “ground truth” subtype membership and survival data (outcome, length of followup, and occurrence of event of interest within the followup period).</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">class</span>(dset)</span></code></pre></div>
+<pre><code>## [1] &quot;list&quot;</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">names</span>(dset)</span></code></pre></div>
+<pre><code>## [1] &quot;clinical&quot; &quot;data&quot;</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">summary</span>(dset<span class="op">$</span>clinical)</span></code></pre></div>
+<pre><code>##  CancerSubType   Outcome         LFU          Event        
+##  Min.   :1.000   Bad :151   Min.   : 0.00   Mode :logical  
+##  1st Qu.:1.000   Good:149   1st Qu.:19.75   FALSE:197      
+##  Median :3.000              Median :31.50   TRUE :103      
+##  Mean   :2.717              Mean   :33.81                  
+##  3rd Qu.:4.000              3rd Qu.:49.00                  
+##  Max.   :4.000              Max.   :71.00</code></pre>
+<p>The raw <tt>data</tt> are simulated as a matrix of continuous values.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">class</span>(dset<span class="op">$</span>data)</span></code></pre></div>
+<pre><code>## [1] &quot;matrix&quot; &quot;array&quot;</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">dim</span>(dset<span class="op">$</span>data)</span></code></pre></div>
+<pre><code>## [1]  20 300</code></pre>
+</div>
+<div id="apply-clinically-realistic-noise" class="section level2">
+<h2>Apply Clinically Realistic Noise</h2>
+<p>The user may add further additive noise to the raw data. The <tt>ClinicalNoiseModel</tt> simulates additive noise for each feature <em>f</em> and patient <em>i</em> as a normal distribution <span class="math inline">\(E_{fi} \sim N(0, \tau)\)</span> , where the standard deviation <span class="math inline">\(\tau\)</span> varies with a hyperparameter along the gamma distribution <span class="math inline">\(\tau \sim Gamma(shape, scale)\)</span>. Thus, the ClinicalNoiseModel generates many features with low noise (such as a tightly calibrated laboratory test) and some features with high noise (such as a blood pressure measured by hand and manually entered into the medical record.) The user may apply default parameters or individual parameters. Next, the <tt>ClinicalNoiseModel</tt> is applied to <tt>blur</tt> the previously simulated data. The default model below generates a low overall level of additive noise.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>cnm &lt;-<span class="st"> </span><span class="kw">ClinicalNoiseModel</span>(<span class="kw">nrow</span>(ce<span class="op">@</span>localenv<span class="op">$</span>eng), <span class="dt">shape =</span> <span class="fl">1.02</span>, <span class="dt">scale =</span> <span class="fl">0.05</span>)</span>
+<span id="cb20-2"><a href="#cb20-2"></a><span class="kw">summary</span>(cnm)</span></code></pre></div>
+<pre><code>## A &#39;NoiseModel&#39; with:
+##   additive offset = 0
+##   additive scale distributed as:
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.00601 0.03036 0.05852 0.06958 0.09856 0.18595 
+##   multiplicative scale = 0</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>noisy &lt;-<span class="st"> </span><span class="kw">blur</span>(cnm, dset<span class="op">$</span>data)</span></code></pre></div>
+</div>
+<div id="simulate-mixed-type-data" class="section level2">
+<h2>Simulate Mixed-Type Data</h2>
+<p><tt>Umpire 2.0</tt> allows the simulation of binary, nominal, and ordinal data from raw, continuous data in variable, user-defined mixtures. The user defines prevalences, summing to 1, of binary, continuous, and categorical data in the desired final mixture. For categorical features, the user may tune the percent of categorical data desired to be nominal and the range of the number of categories to be simulated.</p>
+<p>The data simulated above by the <tt>ClinicalEngine</tt> and <tt>ClinicalNoiseModel</tt> takes rows (not columns) as features, as an omics convention. Thus, by default, when generating data, rows are treated as features and columns as patients. The <tt>makeDataTypes</tt> method transposes its results to a data frame where the columns are features and the rows are patients. This transposition both fits better with the conventions used for clinical data, but also supports the ability to store different kinds of (mixed-type) data in different columns.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>dt &lt;-<span class="st"> </span><span class="kw">makeDataTypes</span>(dset<span class="op">$</span>data,</span>
+<span id="cb23-2"><a href="#cb23-2"></a>                   <span class="dt">pCont =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, <span class="dt">pBin =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, <span class="dt">pCat =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">3</span>,</span>
+<span id="cb23-3"><a href="#cb23-3"></a>                   <span class="dt">pNominal =</span> <span class="fl">0.5</span>, <span class="dt">range =</span> <span class="dv">3</span><span class="op">:</span><span class="dv">9</span>,</span>
+<span id="cb23-4"><a href="#cb23-4"></a>                   <span class="dt">inputRowsAreFeatures =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb23-5"><a href="#cb23-5"></a><span class="kw">names</span>(dt)</span></code></pre></div>
+<pre><code>## [1] &quot;binned&quot;    &quot;cutpoints&quot;</code></pre>
+<p>The <tt>makeDataTypes</tt> function generates a list containing two objects: a data.frame of mixed-type data…</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">class</span>(dt<span class="op">$</span>binned)</span></code></pre></div>
+<pre><code>## [1] &quot;data.frame&quot;</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="kw">dim</span>(dt<span class="op">$</span>binned)</span></code></pre></div>
+<pre><code>## [1] 300  20</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="kw">summary</span>(dt<span class="op">$</span>binned)</span></code></pre></div>
+<pre><code>##  V1           V2              V3               V4               V5      
+##  R:52   Min.   :5.191   Min.   :0.0000   Min.   :0.0000   Min.   :0.00  
+##  S:55   1st Qu.:6.490   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.00  
+##  T:32   Median :6.971   Median :0.0000   Median :0.0000   Median :1.00  
+##  U:59   Mean   :6.965   Mean   :0.4133   Mean   :0.4067   Mean   :0.66  
+##  V:50   3rd Qu.:7.400   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.00  
+##  W:52   Max.   :8.792   Max.   :1.0000   Max.   :1.0000   Max.   :1.00  
+##                                                                         
+##        V6              V7              V8              V9            V10    
+##  Min.   :1.923   Min.   :5.454   Min.   :3.563   Min.   :0.00   X      :53  
+##  1st Qu.:3.578   1st Qu.:6.566   1st Qu.:4.902   1st Qu.:0.00   V      :48  
+##  Median :4.024   Median :7.071   Median :5.378   Median :0.00   Y      :38  
+##  Mean   :4.054   Mean   :7.065   Mean   :5.300   Mean   :0.19   S      :36  
+##  3rd Qu.:4.502   3rd Qu.:7.540   3rd Qu.:5.679   3rd Qu.:0.00   T      :36  
+##  Max.   :5.795   Max.   :8.859   Max.   :6.873   Max.   :1.00   W      :34  
+##                                                                 (Other):55  
+##  V11         V12             V13            V14           V15          V16     
+##  R:40   Min.   :2.797   Min.   :0.00   Min.   :0.0   G      :55   Min.   :0.0  
+##  S:48   1st Qu.:4.086   1st Qu.:0.00   1st Qu.:0.0   E      :42   1st Qu.:0.0  
+##  T:57   Median :4.460   Median :0.00   Median :0.0   F      :41   Median :1.0  
+##  U:39   Mean   :4.440   Mean   :0.07   Mean   :0.1   D      :38   Mean   :0.7  
+##  V:56   3rd Qu.:4.825   3rd Qu.:0.00   3rd Qu.:0.0   A      :34   3rd Qu.:1.0  
+##  W:60   Max.   :5.798   Max.   :1.00   Max.   :1.0   C      :33   Max.   :1.0  
+##                                                      (Other):57                
+##       V17             V18        V19         V20       
+##  Min.   :2.606   Min.   :4.993   A:52   Min.   :2.356  
+##  1st Qu.:4.053   1st Qu.:6.608   B:30   1st Qu.:4.796  
+##  Median :4.528   Median :7.179   C:40   Median :5.529  
+##  Mean   :4.515   Mean   :7.123   D:38   Mean   :5.505  
+##  3rd Qu.:4.912   3rd Qu.:7.608   E:47   3rd Qu.:6.190  
+##  Max.   :6.610   Max.   :8.738   F:48   Max.   :8.570  
+##                                  G:45</code></pre>
+<p>The <tt>cutpoints</tt> contain a record, for each feature, of data type, break points, and labels. Here are two examples of the kind of information stored for a cutpoint.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>dt<span class="op">$</span>cutpoints[[<span class="dv">1</span>]]</span></code></pre></div>
+<pre><code>## $breaks
+##        0% 10.55853% 28.88869% 48.54916% 66.07294% 82.94035%      100% 
+##      -Inf  4.055293  4.728019  5.149966  5.491690  5.900582       Inf 
+## 
+## $labels
+## [1] &quot;T&quot; &quot;S&quot; &quot;U&quot; &quot;W&quot; &quot;V&quot; &quot;R&quot;
+## 
+## $Type
+## [1] &quot;nominal&quot;</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a>dt<span class="op">$</span>cutpoints[[<span class="dv">5</span>]]</span></code></pre></div>
+<pre><code>## $breaks
+## [1]    -Inf 7.35767     Inf
+## 
+## $labels
+## [1] 0 1
+## 
+## $Type
+## [1] &quot;symmetric binary&quot;</code></pre>
+<p>And here is an overview of the number of features of each type.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a>cp &lt;-<span class="st"> </span>dt<span class="op">$</span>cutpoints</span>
+<span id="cb35-2"><a href="#cb35-2"></a>type &lt;-<span class="st"> </span><span class="kw">sapply</span>(cp, <span class="cf">function</span>(X) { X<span class="op">$</span>Type })</span>
+<span id="cb35-3"><a href="#cb35-3"></a><span class="kw">table</span>(type)</span></code></pre></div>
+<pre><code>## type
+## asymmetric binary        continuous           nominal           ordinal 
+##                 1                 8                 3                 2 
+##  symmetric binary 
+##                 6</code></pre>
+<p>The <tt>cupoitns</tt> should be saved for downstream use in the <tt>MixedTypeEngine</tt>.</p>
+</div>
+<div id="the-mixedtypeengine" class="section level2">
+<h2>The MixedTypeEngine</h2>
+<p>The many parameters defining a simulated data mixture can be stored as a single <tt>MixedTypeEngine</tt> for downstream use to easily generate future datasets with the same simulation parameters.</p>
+<p>The <tt>MixedTypeEngine</tt> stores the following components for re-implementation:</p>
+<ol style="list-style-type: decimal">
+<li>The <tt>ClinicalEngine</tt>, including parameters for generating the subtype pattern and survival model.</li>
+<li>The <tt>ClinicalNoiseModel</tt>.</li>
+<li>The <tt>cutpoints</tt> generated by <tt>makeDataTypes</tt>.</li>
+</ol>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>mte &lt;-<span class="st"> </span><span class="kw">MixedTypeEngine</span>(ce,</span>
+<span id="cb37-2"><a href="#cb37-2"></a>                       <span class="dt">noise =</span> cnm,</span>
+<span id="cb37-3"><a href="#cb37-3"></a>                       <span class="dt">cutpoints =</span> dt<span class="op">$</span>cutpoints)</span>
+<span id="cb37-4"><a href="#cb37-4"></a><span class="kw">summary</span>(mte)</span></code></pre></div>
+<pre><code>## A &#39;MixedTypeEngine&#39; (MTE) based on:
+## A &#39;CancerEngine&#39; using the cancer model:
+## --------------
+## Clinical Simulation Model (Raw), a CancerModel object constructed via:
+##    CancerModel(name = &quot;Clinical Simulation Model (Raw)&quot;, nPossible = NP, 
+##     nPattern = nClusters, HIT = hitfn, SURV = SURV, OUT = OUT, 
+##     survivalModel = survivalModel, prevalence = Prevalence(isWeighted, 
+##     nClusters)) 
+## 
+## Pattern prevalences:
+## [1] 0.3173905 0.1315154 0.1265533 0.4245408
+## 
+## Survival effects:
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.63510 -0.40700 -0.24181 -0.21561 -0.01502  0.21166 
+## 
+## Outcome effects:
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.228756 -0.080970 -0.035408 -0.009743  0.116928  0.124044 
+## --------------
+## 
+## Base expression given by:
+## An Engine with 10 components.
+## 
+## Altered expression given by:
+## An Engine with 10 components.
+## 
+## ---------------
+## The MTE uses the following noise model:
+## A &#39;NoiseModel&#39; with:
+##   additive offset = 0
+##   additive scale distributed as:
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.00601 0.03036 0.05852 0.06958 0.09856 0.18595 
+##   multiplicative scale = 0
+## ---------------
+## The MTE simulates clinical data of these types:</code></pre>
+<pre><code>## 
+## asymmetric binary        continuous           nominal           ordinal 
+##                 1                 8                 3                 2 
+##  symmetric binary 
+##                 6</code></pre>
+<p>With <tt>rand</tt>, the user can easily generate new data sets with the same simulation parameters.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a>dset2 &lt;-<span class="st"> </span><span class="kw">rand</span>(mte, <span class="dv">20</span>)</span>
+<span id="cb40-2"><a href="#cb40-2"></a><span class="kw">class</span>(dset2)</span></code></pre></div>
+<pre><code>## [1] &quot;list&quot;</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a><span class="kw">summary</span>(dset2<span class="op">$</span>data)</span></code></pre></div>
+<pre><code>## Length  Class   Mode 
+##      0   NULL   NULL</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a><span class="kw">summary</span>(dset2<span class="op">$</span>clinical)</span></code></pre></div>
+<pre><code>##  CancerSubType Outcome        LFU          Event        
+##  Min.   :1.0   Bad :14   Min.   : 7.00   Mode :logical  
+##  1st Qu.:2.0   Good: 6   1st Qu.:18.75   FALSE:13       
+##  Median :3.5             Median :37.00   TRUE :7        
+##  Mean   :2.9             Mean   :37.35                  
+##  3rd Qu.:4.0             3rd Qu.:54.75                  
+##  Max.   :4.0             Max.   :70.00</code></pre>
+<p>By using the <tt>keepal</tt> argument othe function, you can keep the intermediate datasets produced by the <tt>rand</tt> method.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a>dset3 &lt;-<span class="st"> </span><span class="kw">rand</span>(mte, <span class="dv">25</span>, <span class="dt">keepall =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb46-2"><a href="#cb46-2"></a><span class="kw">class</span>(dset3)</span></code></pre></div>
+<pre><code>## [1] &quot;list&quot;</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a><span class="kw">names</span>(dset3)</span></code></pre></div>
+<pre><code>## [1] &quot;raw&quot;      &quot;clinical&quot; &quot;noisy&quot;    &quot;binned&quot;</code></pre>
+<p>The <tt>raw</tt> and <tt>noisy</tt> elements have the rows as (future clinical) features and the columns as patients/samples.</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a><span class="kw">dim</span>(dset3<span class="op">$</span>raw)</span></code></pre></div>
+<pre><code>## [1] 20 25</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a><span class="kw">summary</span>(<span class="kw">t</span>(dset3<span class="op">$</span>raw))</span></code></pre></div>
+<pre><code>##        V1              V2              V3              V4        
+##  Min.   :4.028   Min.   :5.816   Min.   :1.901   Min.   : 8.537  
+##  1st Qu.:4.535   1st Qu.:6.560   1st Qu.:2.348   1st Qu.: 9.466  
+##  Median :5.425   Median :6.903   Median :3.227   Median :10.173  
+##  Mean   :5.344   Mean   :6.967   Mean   :3.393   Mean   :10.087  
+##  3rd Qu.:5.893   3rd Qu.:7.295   3rd Qu.:4.194   3rd Qu.:10.607  
+##  Max.   :7.708   Max.   :8.818   Max.   :5.475   Max.   :11.558  
+##        V5              V6              V7              V8       
+##  Min.   :6.180   Min.   :2.825   Min.   :6.297   Min.   :4.460  
+##  1st Qu.:6.920   1st Qu.:3.395   1st Qu.:6.818   1st Qu.:4.967  
+##  Median :7.402   Median :3.797   Median :7.160   Median :5.058  
+##  Mean   :7.366   Mean   :3.894   Mean   :7.207   Mean   :5.194  
+##  3rd Qu.:7.798   3rd Qu.:4.177   3rd Qu.:7.574   3rd Qu.:5.448  
+##  Max.   :8.676   Max.   :5.618   Max.   :8.578   Max.   :6.076  
+##        V9             V10             V11             V12       
+##  Min.   :5.222   Min.   :3.932   Min.   :4.832   Min.   :3.785  
+##  1st Qu.:6.182   1st Qu.:4.690   1st Qu.:6.019   1st Qu.:4.342  
+##  Median :6.739   Median :5.504   Median :6.374   Median :4.566  
+##  Mean   :6.704   Mean   :5.418   Mean   :6.354   Mean   :4.762  
+##  3rd Qu.:7.039   3rd Qu.:5.760   3rd Qu.:6.648   3rd Qu.:5.125  
+##  Max.   :8.556   Max.   :6.929   Max.   :8.148   Max.   :6.479  
+##       V13             V14             V15             V16        
+##  Min.   :6.050   Min.   :6.125   Min.   :4.136   Min.   : 8.014  
+##  1st Qu.:7.135   1st Qu.:6.816   1st Qu.:5.638   1st Qu.: 8.626  
+##  Median :7.417   Median :7.232   Median :5.940   Median : 9.244  
+##  Mean   :7.434   Mean   :7.261   Mean   :6.088   Mean   : 9.071  
+##  3rd Qu.:7.879   3rd Qu.:7.779   3rd Qu.:6.558   3rd Qu.: 9.471  
+##  Max.   :8.551   Max.   :8.156   Max.   :7.543   Max.   :10.093  
+##       V17             V18             V19             V20       
+##  Min.   :3.173   Min.   :6.379   Min.   :6.508   Min.   :3.353  
+##  1st Qu.:4.296   1st Qu.:6.945   1st Qu.:6.940   1st Qu.:5.250  
+##  Median :4.825   Median :7.320   Median :7.200   Median :5.704  
+##  Mean   :4.745   Mean   :7.391   Mean   :7.217   Mean   :5.511  
+##  3rd Qu.:5.095   3rd Qu.:7.713   3rd Qu.:7.461   3rd Qu.:5.980  
+##  Max.   :6.312   Max.   :8.652   Max.   :7.832   Max.   :6.405</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a><span class="kw">dim</span>(<span class="kw">t</span>(dset3<span class="op">$</span>noisy))</span></code></pre></div>
+<pre><code>## [1] 25 20</code></pre>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a><span class="kw">summary</span>(dset3<span class="op">$</span>noisy)</span></code></pre></div>
+<pre><code>##        V1               V2               V3               V4        
+##  Min.   : 2.287   Min.   : 2.790   Min.   : 3.404   Min.   : 2.941  
+##  1st Qu.: 5.653   1st Qu.: 5.500   1st Qu.: 5.874   1st Qu.: 4.558  
+##  Median : 6.501   Median : 6.554   Median : 6.646   Median : 6.218  
+##  Mean   : 6.526   Mean   : 6.454   Mean   : 6.631   Mean   : 5.930  
+##  3rd Qu.: 7.464   3rd Qu.: 7.159   3rd Qu.: 7.208   3rd Qu.: 6.799  
+##  Max.   :10.206   Max.   :10.271   Max.   :11.206   Max.   :10.230  
+##        V5               V6               V7              V8       
+##  Min.   : 3.935   Min.   : 2.921   Min.   :3.263   Min.   :3.144  
+##  1st Qu.: 5.416   1st Qu.: 5.379   1st Qu.:5.225   1st Qu.:5.209  
+##  Median : 6.396   Median : 6.525   Median :6.327   Median :6.762  
+##  Mean   : 6.584   Mean   : 6.472   Mean   :6.236   Mean   :6.488  
+##  3rd Qu.: 7.621   3rd Qu.: 7.611   3rd Qu.:7.206   3rd Qu.:7.431  
+##  Max.   :10.188   Max.   :10.608   Max.   :9.419   Max.   :9.205  
+##        V9             V10              V11             V12       
+##  Min.   :4.166   Min.   : 3.269   Min.   :3.477   Min.   :3.911  
+##  1st Qu.:5.557   1st Qu.: 5.045   1st Qu.:5.453   1st Qu.:4.915  
+##  Median :6.553   Median : 5.996   Median :6.502   Median :6.594  
+##  Mean   :6.560   Mean   : 6.344   Mean   :6.422   Mean   :6.518  
+##  3rd Qu.:7.577   3rd Qu.: 7.538   3rd Qu.:7.424   3rd Qu.:7.928  
+##  Max.   :9.531   Max.   :10.452   Max.   :9.666   Max.   :9.389  
+##       V13             V14              V15              V16       
+##  Min.   :3.563   Min.   : 1.941   Min.   : 2.194   Min.   :2.342  
+##  1st Qu.:4.991   1st Qu.: 4.889   1st Qu.: 5.451   1st Qu.:5.049  
+##  Median :6.358   Median : 6.504   Median : 6.011   Median :6.771  
+##  Mean   :6.305   Mean   : 6.221   Mean   : 6.317   Mean   :6.308  
+##  3rd Qu.:7.340   3rd Qu.: 7.357   3rd Qu.: 7.125   3rd Qu.:7.561  
+##  Max.   :9.488   Max.   :10.614   Max.   :11.498   Max.   :9.884  
+##       V17              V18              V19              V20       
+##  Min.   : 2.422   Min.   : 3.298   Min.   : 2.968   Min.   :3.418  
+##  1st Qu.: 4.938   1st Qu.: 4.864   1st Qu.: 5.692   1st Qu.:5.108  
+##  Median : 6.343   Median : 6.580   Median : 6.632   Median :6.509  
+##  Mean   : 6.094   Mean   : 6.343   Mean   : 6.614   Mean   :6.304  
+##  3rd Qu.: 7.371   3rd Qu.: 7.227   3rd Qu.: 7.567   3rd Qu.:7.192  
+##  Max.   :10.057   Max.   :10.199   Max.   :11.299   Max.   :9.389  
+##       V21              V22             V23             V24       
+##  Min.   : 2.162   Min.   :4.072   Min.   :3.012   Min.   :3.273  
+##  1st Qu.: 5.056   1st Qu.:5.482   1st Qu.:4.889   1st Qu.:5.086  
+##  Median : 6.289   Median :6.592   Median :6.095   Median :6.165  
+##  Mean   : 6.327   Mean   :6.533   Mean   :6.270   Mean   :6.166  
+##  3rd Qu.: 7.420   3rd Qu.:7.702   3rd Qu.:7.600   3rd Qu.:6.810  
+##  Max.   :11.418   Max.   :9.413   Max.   :9.530   Max.   :9.474  
+##       V25        
+##  Min.   : 2.118  
+##  1st Qu.: 4.941  
+##  Median : 6.422  
+##  Mean   : 6.176  
+##  3rd Qu.: 7.322  
+##  Max.   :10.860</code></pre>
+<p>Noisy data arises by adding simulated noise to the raw data.</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a><span class="kw">plot</span>(dset3<span class="op">$</span>raw[<span class="dv">5</span>,], dset3<span class="op">$</span>noisy[<span class="dv">5</span>,], <span class="dt">xlab =</span> <span class="st">&quot;Raw&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Noisy&quot;</span>, <span class="dt">pch=</span><span class="dv">16</span>)</span></code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAaVBMVEUAAAAAADoAAGYAOjoAOpAAZrY6AAA6ADo6AGY6Ojo6OpA6ZmY6kLY6kNtmAABmADpmZgBmZmZmtv+QOgCQtpCQ2/+2ZgC2kDq225C2/7a2///bkDrb/7bb////tmb/25D//7b//9v////uR1GuAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAH9ElEQVR4nO2d2WKrNhRFSZqkt4OdNq5pGxoP/P9HFgljA0ZsNBxJOHs95Ca+SIJloQGOoKjJLEXqHcgdCgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCADaCTttN8/NQFMXzp9T+ZIe1oOrlS/32YchuNUgJuqjRmjyzS8PFjZig45sWdDCcZBkKGtaWrvawBnUMz6fr+SUkSGX+WnfNtWd2URi1OLKCau3oad90ZAY/FBQ5O3/GfZZoGxQ/uwCM+3TJXqxHtdZe7Prp4uShdsJy/BWTqd3iKXZj8oujoCvTVVtIUNkMg867pjjDVOy7C1Lj51KNFNczUIwq6LxrtByageKaphox2yA9D2unqSuarEbsxVZagyYRboO0Ku/sUsJeDMBxEICCABQEoCAABQEoCPC9BS24LvVtBE1OIxZcufsugiYn6kuubX4TQZMuKKhXHAWB4qYvhrENupU3um06+mUm4eISXHbrPpdkt33Gt5UXpwu+YZLsrIq2+oYoCG29OFvH3YmTnVXRFITKlm2DTlsdGuVJ0rmYTR/hYrJqCjAFRgUvNzWOVc3b0aMLahV5hIk/uKCDvqFz3hnuCoYsNzUOglQMa2vGdF85ZLmpcenF9D3lWOWm5uHGQaGneU6n2EY10TPtz4LVPlKCgk+EHQSVL1/Ht9e6NA8Xl6z2Wb6LNoS/VODSBn00leNjroVOtlZD4FqKm6CykWOKgK7TrfYZXWwKYsrlFHs9bV++Ttv5UyxBDbr3E8CQ2zjoaX/ezcxYE632mfDjb0iqm0+x2qevpFeb/Cw91Dhowk/he6Y9lKDa5MfDkKWgpk1pG5ilc/k0q32GJ1hMQb70vlpJemWsTFDI7OYOO1xv7yLo+NYU6TmlDzBAGR248a/ovVjbd1fGEGjVUsEraf7jk9GpI3Xe2gvqgudNY+RaCfrtDVyxDi3o9mdgT25zMQWYrFbzN4fEBIWuSUI16HI9yOwoUBt0Jyh4HynUBm26TU2jpTC92NiQwAUhkV7MOEV1KHcmiztD9x8GKCX4hnVkQcXEp/6Z3/ILvmG07Axj8rS92HUiVng+fivEQcSYtLjXoDKDe/MR/LgKamqSuRMLWu58LvKxjm6CDt6PtxM/sFA4Carm7hoGLjc1DoLOO+/wqYcW5N382JWbGmtB/s2PXbmpsRUEJunhy03NmgeKUVjxVCMOFARY2W2fCEPncYnBN5TMLsbka1xk8A0Fs4syfR+XGXxDwewoCCWiIJSKbRBKxl7sbsPEj33NQpBZQoJGZ7wHwTe0z84swW9UGYQMBJkleA67g0BBgFUIClu0HYK3nhev9kFtkOF/LHbIAzlBFqt9Znsx0+eRDIkJEl2rEfHUExMkutrnEQSxBs0gv9pn5W1QLb/aZ929WPzs5KAggLSg5at9Ul/XMJDNbZ/2w/ws5XKKFWZ1aclQkLGkJPKEBKmF9Sre3BhurrPrHfECQWmql4wg7efnPZisDo4YCkp0AsrN5ttne8xMNUZHXIAVyo8l6KNbFDQzWZ064vkW6GEE6dpTWdYgvAcP1Aadts+fvTcgGbKzPeJH6sX09dZiZkXduBfLllzGQdmSTNBqSCTIvSS///ZNLpEycEkUREF+JVEQBfmVREEU5FcSBVHQY0JBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIA4oJUtEx3n/EWR7yMy23Ky3N7bFPX7cvAujgUh+QKaUGHl6/6+ioKHTpji0fqSocsf3gULi6oDQbpQj6d3st1jRe1Tt2+A6N7F4/jS8GEBQ2/tsrhIUXH6xOarVMPBbkUXosLOjz/u729NrH8pbB+h2J5/eLtUw9OMZfCa3FBlVp7173upX2ieWm1k7dVIS6pD7dwSpfkCmlBev8Gp79dWzCORLJK3cac9p3YN0TSgvQOXRaZtQz+gJSjUDab1O22g0UBdoUrxNsgLajfVFt1t3frrmxSt7VvUAft+3phQW288KVit1+fVS3vfeP2qQcpHArXSA8UVbRn97j8tse1aif7X7996kEbZJ9cIz7VOLSd62VM0hv6L+LSgDim1incC9dwsgqgIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFAXIUdN610b/+bzUNQJ6CdMjeIcR7Tb3JWFAX2piWjAW14Xdt0Ir+SFepcUyeNBkL0v/oB+897XUglnoZ7DUYKxYZC6qaCnN637fRcyrUrPzz5ctxQYE7eQrqr2FRMWofKtjx9P7Xj0/HBQXu5CnoVVWbSzUqnv9R8Zfl5vjrf+/7MnbDna2g9s0COjZV/6he/n6ty993sbv+fAXVpVppoc4o3Xsdf/yxqaufYjdBOQtSqytU5TltVV06bfXKlMidfNaCmvZno9qgp72qSxMLL6KQo6CsoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCAP8DC9bx7IcXbxAAAAAASUVORK5CYII=" alt />
+<p class="caption">Raw and noisy data.</p>
+</div>
+<p>The <tt>binned</tt> element has columns as features and rows as samples. Binned data arises by applying cut points to noisy data.</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1"></a><span class="kw">dim</span>(dset3<span class="op">$</span>binned)</span></code></pre></div>
+<pre><code>## [1] 25 20</code></pre>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1"></a><span class="kw">summary</span>(dset3<span class="op">$</span>binned)</span></code></pre></div>
+<pre><code>##  V1          V2        V3     V4     V5           V6              V7       
+##  R:6   Min.   :5.878   0:12   0:11   0:12   Min.   :2.921   Min.   :6.165  
+##  S:7   1st Qu.:6.477   1:13   1:14   1:13   1st Qu.:3.418   1st Qu.:6.821  
+##  T:2   Median :6.918                        Median :3.895   Median :7.197  
+##  U:2   Mean   :6.959                        Mean   :3.892   Mean   :7.199  
+##  V:5   3rd Qu.:7.247                        3rd Qu.:4.306   3rd Qu.:7.658  
+##  W:3   Max.   :8.810                        Max.   :5.739   Max.   :8.577  
+##                                                                            
+##        V8        V9          V10    V11        V12        V13    V14   
+##  Min.   :4.482   0:19   T      :6   R:5   Min.   :3.578   0:22   0:22  
+##  1st Qu.:4.925   1: 6   R      :5   S:3   1st Qu.:4.252   1: 3   1: 3  
+##  Median :5.103          X      :4   T:2   Median :4.619                
+##  Mean   :5.195          S      :3   U:4   Mean   :4.771                
+##  3rd Qu.:5.443          V      :2   V:7   3rd Qu.:5.154                
+##  Max.   :6.113          W      :2   W:4   Max.   :6.379                
+##                         (Other):3                                      
+##       V15    V16         V17             V18        V19        V20       
+##  D      :5   0: 8   Min.   :3.156   Min.   :6.304   A:3   Min.   :3.360  
+##  F      :4   1:17   1st Qu.:4.293   1st Qu.:6.895   B:2   1st Qu.:5.263  
+##  G      :4          Median :4.838   Median :7.368   C:4   Median :5.701  
+##  A      :3          Mean   :4.748   Mean   :7.388   D:6   Mean   :5.496  
+##  B      :3          3rd Qu.:5.105   3rd Qu.:7.768   E:6   3rd Qu.:5.971  
+##  H      :3          Max.   :6.333   Max.   :8.630   F:4   Max.   :6.361  
+##  (Other):3                                          G:0</code></pre>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1"></a><span class="kw">plot</span>(dset3<span class="op">$</span>binned[,<span class="dv">5</span>], dset3<span class="op">$</span>noisy[<span class="dv">5</span>,], <span class="dt">xlab =</span> <span class="st">&quot;Binned&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Noisy&quot;</span>)</span></code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAATlBMVEUAAAAAADoAAGYAOpAAZrY6AAA6ADo6AGY6ZmY6kNtmAABmtrZmtv+QOgCQkGaQ2/+2ZgC2///T09PbkDrb////tmb/25D//7b//9v///+nQblkAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAGP0lEQVR4nO2dbVujOBhGcdTdbVfXziDW/v8/ugSKzrSFm5CEhybnXJdTPzB32iPkpSShOsEklfUb2DoIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCCBj6Djftf+21RV9eNnqvezObwF1Y/v7reXkbi7IZWgs5pOU2CcKckEfTx3gpqRiwxBnEETHPfu4n06DdV1YFwoQbVMEkGnztHDW9uQjfgxPYO8yk4laOW4dGUjKNbBCz9RvcFWbFOCLlO8+1/WlHiJeYEgQSJBh7Yb9PnaXkkjQ7HS6yDXfz64nuImOopBZScR9PnaamnajuI2hxr2grpxWD9M3eJg1V4QZ5Diqw7qVAXHWVJiK+YF/SBBiYI2UAetHpeubATFOhhBMVNXj0tXdomCvECQAEGCLAXFvBufp6BfISAIQXcsaJ3bPncsKFXcRTiCRDiCRDiCRLipoOO+mxoV+hnCIybCjc+gum2ExiZGLYiLj7WgUwRHuQvqFQVME89cUNPd0Pl8Hbkr6BsXG2NBbg5rb2bsvrJXXAKsW7HunnLoZwiPmAi3PYPifIa4cRfhtoLcnJ96uMpuMmO1T86CDo/vH89Pp8N4d3HOap+55S7B9htF95mbtg2bqKGt12rYCzq0csZmQJ/sV/vYCmqvreP+8f24n77ETM8g60q6enj7fJ0YsVqv9rmHZt50tc89CFo57iIcQSLcTlBbp/QVTDVzLG+y2se4FYvz1qPErUCWl1jMspcI+nhuz4DAIX3Ogvq2ux6dAu1qKvlNWsaChsnzY33kkxP0z7P4xjpjQcMAXQxW6+mbQ2sK8mq1rv7z7FKGX2adQefvg8Yd5dyKzamDdsOhY70l8WcL+ZvHJUkrNjpEXVDugqOjkqQfhKAVy01ReJKih7HYd0UQtP1WroK+OWz43nxMFgpqz6TxRixqudYsvTcfur1d3oLqqbuGkctdcHRUFgj6fA2ePpW1oODqx6/cBUdHxVtQePVzo9wlX4yuNPTwFSQG6QvLDfuW/deGBCXqKOYjKFG5CBJxCPpKuV2vIkjEIUjEIUjEIUjEIUjEIUjEIUjEIUjEIUjEIUjEZfR1R5pyESTiShPkvdqntDrIe7VPiYK81mqUKMhrtU+JgjiDJvBe7VOaoJPvap8CBfnFIUjEFSxo3mqfggVdptweHSBIxCFIxJU2WD11C+vdfPPR6eb5zg+aRefnr7doW1PkJqjrP/d7e8TZWCA/QS/DoqBlW1MY1jlXbyX6gQ539tQRzyBD0gg67n/8/O0JSKFxlqRq5pv+Whid0Fi8oJXj0mEm6G4wEuRH3MLTfBQEmaSaFI6gVdPSppoUjqBV09KmmhSOoFXT0qaaFJ6hoHsAQQIECRAkQJAAQQIECRAkQJAAQQIECRAkQJDATlATvPXwn3z8HWP7mivMBLm716N3sBfgbotHC/sNK0H9LJGJ5+R4Mr57aiBWgvo1HxOPgfGjqXYBT0WbwkyQm6gW8qi3KzIT1Fc/MSshBKnEvARxiQkiV9Kn7ATFbuazExS9o5idIPfAyahDjewE3QkIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIgCABggQIEiBIsCVBh25bloepTeS+iTrxYYJNCer2/arnffJyBc14qr2jZEEv559/91X1/dpNmOk3snYzZ/4rVpDbZq8X1Cpor7fhtfv5eN71+102cScXjbMpQf3mWa2mXtCum8r4x6ubJtVPbzyUKKg7g5rq6esyc/8Mr32l09rpp5KVWwe5K+imoPPubC916YLqEUGDEc6gx/dbgr46j+cp1sUKaqqXm3VQr+Rwbs4KbsWGocaVoK4f1F1epfaDNgmCBAgSIEiAIAGCBAgSIEiAIAGCBAgSIEiAIAGCBAgSIEiAIAGCBAgSIEiAIAGCBAgSIEjwP5CwiunR9uzlAAAAAElFTkSuQmCC" alt />
+<p class="caption">Noisy and binned data.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
